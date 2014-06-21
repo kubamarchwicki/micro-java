@@ -1,0 +1,11 @@
+= Micro Java
+
+A showcase collection of simple java based projects. The projects are server-side (backend) implementation for https://github.com/tastejs/todomvc[TodoMVC example] - the Backbone implementation.
+
+The project is a showcase code for my *JEE development without a hassle* talk, where I cover multiple lightweight alternatives to traditional fully blow application stacks. 
+
+The project is a bit inspired by https://github.com/kouphax/todomvc-server[James Hughes project] which I participated in, though with slightly changed rules:
+
+* Focuses purely on Java frameworks
+* Each example is backed with a database (MySQL)
+* Database connection is indended to be as lightweight as the web stack itself
