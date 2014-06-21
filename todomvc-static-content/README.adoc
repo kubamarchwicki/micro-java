@@ -1,0 +1,1 @@
+This is a clone of https://github.com/kouphax/todomvc-server-static-content[TodoMVC Server static content] which is an early clone of http://todomvc.com/architecture-examples/backbone/[Pure JavaScript TodoMVC]
