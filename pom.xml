@@ -12,6 +12,7 @@
     <modules>
         <module>todomvc-static-content</module>
         <module>examples/dropwizard</module>
+        <module>examples/spark</module>
     </modules>
     
 </project>
