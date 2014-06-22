@@ -9,3 +9,23 @@ The project is a bit inspired by https://github.com/kouphax/todomvc-server[James
 * Focuses purely on Java frameworks
 * Each example is backed with a database (MySQL)
 * Database connection is indended to be as lightweight as the web stack itself
+
+=== API
+
+Application API confronts following endpoints:
+[options="header", cols="1,2,6"]
+|===
+|Method | URL | Description
+
+|GET 
+|**/todos** 
+|Returns JSON of all todos
+
+|POST
+|**/todos** 
+|Accepts JSON encoded body returns created Todo (e.g. with the ID field populated) or Invalid response (400 Status Code) with validation errors 
+
+|PUT 
+|**/todos/[id]** 
+|Accepts a JSON encoded body of a Todo and the Todo with an [id] will be updated. If [id] does not exist a 404 is returned
+|=== 
