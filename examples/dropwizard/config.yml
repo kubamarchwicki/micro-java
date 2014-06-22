@@ -1,0 +1,7 @@
+database:
+  driverClass: com.mysql.jdbc.Driver
+  user: root
+  password: root
+  url: jdbc:mysql://localhost/microjava
+  properties:
+    charSet: UTF-8

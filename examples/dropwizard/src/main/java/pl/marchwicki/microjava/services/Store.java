@@ -1,57 +1,50 @@
 package pl.marchwicki.microjava.services;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import pl.marchwicki.microjava.model.Todo;
+import pl.marchwicki.microjava.services.db.TodoDAO;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 
 public class Store {
 
-    private final AtomicLong idGenerator = new AtomicLong(1);
-    private final List<Todo> store = new ArrayList<Todo>();
+    final private TodoDAO dao;
+
+    public Store(TodoDAO dao) {
+        this.dao = dao;
+    }
 
     public Todo save(Todo data) {
-        Todo todo = new Todo( idGenerator.getAndIncrement(), data.getTitle(),
-                data.getOrder(), data.isCompleted());
-        store.add(todo);
-        return todo;
+        long id = dao.insert(data.getTitle(), data.getOrder(), data.isCompleted());
+        return Todo.TodoBuilder.aTodo()
+                .withId(id)
+                .withTitle(data.getTitle())
+                .withOrder(data.getOrder())
+                .isCompleted(data.isCompleted())
+                .build();
     }
 
     public Optional<Todo> get(final long id) {
-        Todo todo = Iterables.find(store, new Predicate<Todo>() {
-            @Override
-            public boolean apply(@Nullable Todo todo) {
-                return todo.getId() == id;
-            }
-        });
-
-        return Optional.fromNullable(todo);
+        return Optional.fromNullable(dao.findById(id));
     }
 
     public List<Todo> getAll() {
-        return Lists.newArrayList(store);
+        return dao.getAllTodos();
     }
 
     public Optional<Todo> save(long id, Todo data) {
         Optional<Todo> maybeTodo = get(id);
 
         if(maybeTodo.isPresent()) {
-            // remove the old td
-            final Todo oldTodo = maybeTodo.get();
-            store.remove(maybeTodo.get());
+            dao.update(id, data);
 
-            // create a new td with the same value
-            final Todo newTodo = new Todo(oldTodo.getId(), data.getTitle(),
-                    data.getOrder(), data.isCompleted());
-            store.add(newTodo);
-
+            final Todo newTodo =  Todo.TodoBuilder.aTodo()
+                    .withId(id)
+                    .withTitle(data.getTitle())
+                    .withOrder(data.getOrder())
+                    .isCompleted(data.isCompleted())
+                    .build();
             return Optional.of(newTodo);
         } else {
             return Optional.absent();
@@ -62,10 +55,9 @@ public class Store {
         Optional<Todo> maybeTodo = get(id);
 
         if(maybeTodo.isPresent()) {
-            Todo todo = maybeTodo.get();
-            store.remove(maybeTodo.get());
+            dao.delete(id);
         }
 
-        return maybeTodo;
+        return Optional.absent();
     }
 }
