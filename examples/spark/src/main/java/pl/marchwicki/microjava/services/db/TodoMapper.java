@@ -1,21 +1,20 @@
 package pl.marchwicki.microjava.services.db;
 
-import org.skife.jdbi.v2.StatementContext;
-import org.skife.jdbi.v2.tweak.ResultSetMapper;
+import org.jooq.Record;
+import org.jooq.RecordMapper;
 import pl.marchwicki.microjava.model.Todo;
+import pl.marchwicki.microjava.services.db.tables.records.TodosRecord;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-public class TodoMapper implements ResultSetMapper<Todo> {
+public class TodoMapper implements RecordMapper<Record, Todo> {
 
     @Override
-    public Todo map(int i, ResultSet resultSet, StatementContext statementContext) throws SQLException {
+    public Todo map(Record record) {
+        TodosRecord todosRecord = (TodosRecord) record;
         return Todo.TodoBuilder.aTodo()
-                .withId(resultSet.getLong("todo_id"))
-                .withTitle(resultSet.getString("todo_title"))
-                .withOrder(resultSet.getLong("todo_order"))
-                .isCompleted(resultSet.getBoolean("todo_completed"))
+                .withId(todosRecord.getTodoId())
+                .withTitle(todosRecord.getTodoTitle())
+                .withOrder(todosRecord.getTodoOrder())
+                .isCompleted(todosRecord.getTodoCompleted())
                 .build();
     }
 }

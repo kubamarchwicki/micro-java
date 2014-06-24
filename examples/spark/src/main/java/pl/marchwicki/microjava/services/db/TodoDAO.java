@@ -1,33 +1,53 @@
 package pl.marchwicki.microjava.services.db;
 
-import org.skife.jdbi.v2.sqlobject.Bind;
-import org.skife.jdbi.v2.sqlobject.BindBean;
-import org.skife.jdbi.v2.sqlobject.GetGeneratedKeys;
-import org.skife.jdbi.v2.sqlobject.SqlQuery;
-import org.skife.jdbi.v2.sqlobject.SqlUpdate;
-import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapper;
+import org.jooq.DSLContext;
 import pl.marchwicki.microjava.model.Todo;
+import pl.marchwicki.microjava.services.db.tables.records.TodosRecord;
 
 import java.util.List;
 
-@RegisterMapper(TodoMapper.class)
-public interface TodoDAO {
+import static pl.marchwicki.microjava.services.db.Tables.*;
 
-    @SqlUpdate("update todos set todo_title = :todo.title, todo_order = :todo.order, todo_completed = :todo.completed " +
-            "where todo_id = :id")
-    void update(@Bind("id") long id, @BindBean("todo") Todo todo);
+public class TodoDAO {
 
-    @SqlUpdate("insert into todos (todo_title, todo_order, todo_completed) values (:title, :order, :completed)")
-    @GetGeneratedKeys
-    long insert(@Bind("title") String title, @Bind("order") long order, @Bind("completed") Boolean completed);
+    DSLContext context;
 
-    @SqlUpdate("delete from todos where todo_id = :id")
-    void delete(@Bind("id") long id);
+    public TodoDAO(DSLContext ctx) {
+        this.context = ctx;
+    }
 
-    @SqlQuery("select * from todos where todo_id = :id")
-    Todo findById(@Bind("id") long id);
+    public void update(long id, Todo todo) {
+        context.update(TODOS)
+                .set(TODOS.TODO_TITLE, todo.getTitle())
+                .set(TODOS.TODO_ORDER, todo.getOrder())
+                .set(TODOS.TODO_COMPLETED, todo.isCompleted())
+                .where(TODOS.TODO_ID.equal(id))
+                .execute();
+    }
 
-    @SqlQuery("select * from todos")
-    List<Todo> getAllTodos();
+    public long insert(String title, long order, Boolean completed) {
+        TodosRecord todosRecord = context.newRecord(TODOS);
+        todosRecord.setTodoTitle(title);
+        todosRecord.setTodoOrder(order);
+        todosRecord.setTodoCompleted(completed);
+
+        todosRecord.store();
+        return todosRecord.getTodoId();
+    }
+
+    public void delete(long id) {
+        TodosRecord todosRecord = context.fetchOne(TODOS, TODOS.TODO_ID.equal(id));
+        todosRecord.delete();
+    }
+
+    public Todo findById(long id) {
+        return context.select()
+                .from(TODOS).where(TODOS.TODO_ID.equal(id))
+                .fetchOne().map(new TodoMapper());
+    }
+
+    public List<Todo> getAllTodos() {
+        return context.select().from(TODOS).fetch().map(new TodoMapper());
+    }
 
 }
