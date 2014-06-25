@@ -9,10 +9,21 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>pl.marchwicki</groupId>
+                <artifactId>todomvc-static-content</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <modules>
         <module>todomvc-static-content</module>
         <module>examples/dropwizard</module>
         <module>examples/spark</module>
+        <module>examples/jetty</module>
     </modules>
     
 </project>
