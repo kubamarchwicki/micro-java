@@ -1,7 +1,7 @@
 package pl.marchwicki.microjava.resources;
 
 import pl.marchwicki.microjava.model.Todo;
-import pl.marchwicki.microjava.services.db.Store;
+import pl.marchwicki.microjava.services.Store;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;

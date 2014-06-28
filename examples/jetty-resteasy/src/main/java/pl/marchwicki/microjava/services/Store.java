@@ -1,6 +1,7 @@
-package pl.marchwicki.microjava.services.db;
+package pl.marchwicki.microjava.services;
 
 import pl.marchwicki.microjava.model.Todo;
+import pl.marchwicki.microjava.services.db.TodoDAO;
 
 import java.util.List;
 import java.util.Optional;
