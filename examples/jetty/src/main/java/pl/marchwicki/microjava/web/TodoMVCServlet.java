@@ -3,6 +3,7 @@ package pl.marchwicki.microjava.web;
 import com.google.gson.Gson;
 import org.sql2o.Sql2o;
 import pl.marchwicki.microjava.model.Todo;
+import pl.marchwicki.microjava.services.db.Store;
 import pl.marchwicki.microjava.services.db.TodoDAO;
 
 import javax.servlet.ServletConfig;
@@ -22,7 +23,7 @@ import java.util.regex.Pattern;
 @WebServlet(urlPatterns = "/todos/*")
 public class TodoMVCServlet extends HttpServlet {
 
-    private TodoDAO dao;
+    private Store store;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -37,12 +38,13 @@ public class TodoMVCServlet extends HttpServlet {
                 props.getProperty("user"),
                 props.getProperty("password"));
 
-        this.dao = new TodoDAO(ds);
+        this.store = new Store(new TodoDAO(ds));
+
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        final List<Todo> todos = dao.getAllTodos();
+        final List<Todo> todos = store.getAll();
 
         resp.getWriter().write(new Gson().toJson(todos));
         resp.getWriter().flush();
@@ -55,8 +57,7 @@ public class TodoMVCServlet extends HttpServlet {
         String body = reader.readLine();
 
         Todo data = new Gson().fromJson(body, Todo.class);
-        Long newId = dao.insert(data.getTitle(), data.getOrder(), data.isCompleted());
-        Todo todo = dao.findById(newId);
+        Todo todo = store.save(data);
 
         resp.setStatus(HttpServletResponse.SC_CREATED);
         resp.setContentType("application/json");
@@ -74,7 +75,7 @@ public class TodoMVCServlet extends HttpServlet {
             String body = reader.readLine();
 
             Todo data = new Gson().fromJson(body, Todo.class);
-            dao.update(maybeId.get(), data);
+            store.save(maybeId.get(), data);
 
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
         } else {
@@ -87,7 +88,7 @@ public class TodoMVCServlet extends HttpServlet {
         Optional<Long> maybeId = getIdFromPath(req.getRequestURI());
 
         if (maybeId.isPresent()) {
-            dao.delete(maybeId.get());
+            store.remove(maybeId.get());
         } else {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
