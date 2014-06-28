@@ -21,11 +21,6 @@
 
     <modules>
         <module>todomvc-static-content</module>
-        <module>examples/dropwizard</module>
-        <module>examples/spark</module>
-        <module>examples/jetty</module>
-        <module>examples/jetty-resteasy</module>
-        <module>examples/webbit</module>
     </modules>
     
 </project>
