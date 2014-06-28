@@ -16,7 +16,7 @@ public class Store {
     }
 
     public Todo save(Todo data) {
-        long id = dao.insert(data.getTitle(), data.getOrder(), data.isCompleted());
+        long id = dao.insert(data);
         return Todo.TodoBuilder.aTodo()
                 .withId(id)
                 .withTitle(data.getTitle())

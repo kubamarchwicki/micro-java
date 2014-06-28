@@ -14,7 +14,7 @@ import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.Optional;
 
-@Path("/")
+@Path("/todos/")
 @Produces(MediaType.APPLICATION_JSON)
 public class TodoMVCResource {
 
@@ -31,6 +31,7 @@ public class TodoMVCResource {
 
     @POST
     public Todo create(Todo todo) {
+        System.out.println("todo.getTitle() = " + todo.getTitle());
         return store.save(todo);
     }
 

@@ -15,13 +15,28 @@ public class TodoDAO {
     }
 
     public void update(long id, Todo todo) {
+        try (SqlSession session = sf.openSession()) {
+            TodoMapper mapper = session.getMapper(TodoMapper.class);
+            mapper.update(id, todo);
+            session.commit();
+        }
     }
 
-    public long insert(String title, long order, Boolean completed) {
-        return 0;
+    public long insert(Todo data) {
+        try (SqlSession session = sf.openSession()) {
+            TodoMapper mapper = session.getMapper(TodoMapper.class);
+            mapper.insert(data);
+            session.commit();
+            return data.getId();
+        }
     }
 
     public void delete(long id) {
+        try (SqlSession session = sf.openSession()) {
+            TodoMapper mapper = session.getMapper(TodoMapper.class);
+            mapper.delete(id);
+            session.commit();
+        }
     }
 
     public Todo findById(long id) {

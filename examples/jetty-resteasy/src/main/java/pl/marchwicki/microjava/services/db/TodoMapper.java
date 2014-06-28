@@ -3,6 +3,7 @@ package pl.marchwicki.microjava.services.db;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
@@ -15,14 +16,14 @@ public interface TodoMapper {
 
     @Update("update todos set todo_title = #{todo.title}, todo_order = #{todo.order}, todo_completed = #{todo.completed} " +
             "where todo_id = #{id}")
-    void update(long id, Todo todo);
+    void update(@Param("id") long id, @Param("todo") Todo todo);
 
-    @Insert("insert into todos (todo_title, todo_order, todo_completed) values (#{title}, #{order}, #{completed})")
-    @Options(useGeneratedKeys = true, keyProperty = "id")
-    long insert(String title, long order, Boolean completed);
+    @Insert("insert into todos (todo_title, todo_order, todo_completed) values (#{todo.title}, #{todo.order}, #{todo.completed})")
+    @Options(useGeneratedKeys = true, keyProperty = "todo.id")
+    long insert(@Param("todo") Todo data);
 
     @Delete("delete from todos where todo_id = #{id}")
-    void delete(long id);
+    void delete(@Param("id") long id);
 
     @Select("select * from todos where todo_id = #{id}")
     @Results(value = {
@@ -31,7 +32,7 @@ public interface TodoMapper {
             @Result(property = "order", column = "todo_order"),
             @Result(property = "completed", column = "todo_completed"),
     })
-    Todo findById(long id);
+    Todo findById(@Param("id") long id);
 
     @Select("select * from todos")
     @Results(value = {
