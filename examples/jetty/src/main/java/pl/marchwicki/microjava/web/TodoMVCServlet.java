@@ -1,14 +1,10 @@
 package pl.marchwicki.microjava.web;
 
 import com.google.gson.Gson;
-import org.sql2o.Sql2o;
 import pl.marchwicki.microjava.model.Todo;
 import pl.marchwicki.microjava.services.db.Store;
-import pl.marchwicki.microjava.services.db.TodoDAO;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,30 +12,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@WebServlet(urlPatterns = "/todos/*")
 public class TodoMVCServlet extends HttpServlet {
 
-    private Store store;
+    private final Store store;
 
-    @Override
-    public void init(ServletConfig config) throws ServletException {
-        final Properties props = new Properties();
-        try {
-            props.load(TodoMVCServlet.class.getResourceAsStream("/db.properties"));
-        } catch (IOException e) {
-            throw new ServletException(e);
-        }
-
-        final Sql2o ds = new Sql2o(props.getProperty("url"),
-                props.getProperty("user"),
-                props.getProperty("password"));
-
-        this.store = new Store(new TodoDAO(ds));
-
+    public TodoMVCServlet(Store store) {
+        this.store = store;
     }
 
     @Override
