@@ -15,7 +15,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
-@Path("/todos/")
+@Path("/")
 @Produces(MediaType.APPLICATION_JSON)
 public class TodoMVCResource {
 

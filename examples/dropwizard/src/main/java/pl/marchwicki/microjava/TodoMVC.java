@@ -18,7 +18,7 @@ public class TodoMVC extends Application<TodoMVCConfiguration> {
 
     @Override
     public void initialize(Bootstrap<TodoMVCConfiguration> bootstrap) {
-        bootstrap.addBundle(new AssetsBundle("/META-INF/resources", "/www"));
+        bootstrap.addBundle(new AssetsBundle("/META-INF/resources", "/"));
     }
 
     @Override
@@ -27,6 +27,8 @@ public class TodoMVC extends Application<TodoMVCConfiguration> {
         final DBI jdbi = factory.build(environment, configuration.getDataSourceFactory(), "mysql");
         final TodoDAO dao = jdbi.onDemand(TodoDAO.class);
         final Store store = new Store(dao);
+
+        environment.jersey().setUrlPattern("/todos/*");
         environment.jersey().register(new TodoMVCResource(store));
     }
 }
