@@ -1,18 +1,17 @@
-package pl.marchwicki.microjava.repositories;
+package pl.marchwicki.microjava.repositories.data;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import pl.marchwicki.microjava.model.Todo;
+import pl.marchwicki.microjava.repositories.TodoDAO;
 
 import java.util.List;
 
-@Component
-public class SpringDataTodoDAO implements TodoDAO {
+public class SpringDataTodoRepository implements TodoDAO {
 
     private final TodoRepository repository;
 
     @Autowired
-    public  SpringDataTodoDAO(TodoRepository repository) {
+    public SpringDataTodoRepository(TodoRepository repository) {
         this.repository = repository;
     }
 

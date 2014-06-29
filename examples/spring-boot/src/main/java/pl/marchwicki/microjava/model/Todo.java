@@ -5,11 +5,20 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "todos")
+@NamedQueries({
+        @NamedQuery(name = Todo.GET_ALL, query = "from Todo"),
+        @NamedQuery(name = Todo.GET_BY_ID, query = "from Todo where id = :id")
+})
 public class Todo {
+
+    public final static String GET_ALL = "Todo.getAll()";
+    public final static String GET_BY_ID = "Todo.getById()";
 
     @Id
     @Column(name = "todo_id")
