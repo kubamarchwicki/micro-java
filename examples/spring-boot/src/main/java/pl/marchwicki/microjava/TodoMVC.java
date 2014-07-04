@@ -25,7 +25,7 @@ import javax.sql.DataSource;
 public class TodoMVC extends SpringBootServletInitializer {
 
     public static void main(String[] args) throws Exception {
-        SpringApplication.run(JdbcConfiguration.class, args);
+        SpringApplication.run(SpringDataConfiguration.class, args);
     }
 
     @Configuration
