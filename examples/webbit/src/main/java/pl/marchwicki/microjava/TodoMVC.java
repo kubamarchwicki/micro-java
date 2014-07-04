@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import org.skife.jdbi.v2.DBI;
 import org.webbitserver.WebServer;
 import org.webbitserver.handler.EmbeddedResourceHandler;
+import org.webbitserver.handler.logging.LoggingHandler;
+import org.webbitserver.handler.logging.SimpleLogSink;
 import org.webbitserver.netty.NettyWebServer;
 import org.webbitserver.rest.Rest;
 import pl.marchwicki.microjava.model.Todo;
@@ -30,6 +32,7 @@ public class TodoMVC {
         final Store store = new Store(dao);
 
         WebServer server = new NettyWebServer(9991)
+                .add(new LoggingHandler(new SimpleLogSink()))
                 .add(new EmbeddedResourceHandler("META-INF/resources"))
                 .add("/", new EmbeddedResourceHandler("META-INF/resources/index.html"));
 
