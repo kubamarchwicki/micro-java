@@ -22,7 +22,7 @@ public class TodoInsertQuery extends SqlUpdate {
         compile();
     }
 
-    public long run(String title, long order, Boolean completed) {
+    public long run(final String title, final long order, final Boolean completed) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         Map<String, Object> params = new HashMap<String, Object>() {{

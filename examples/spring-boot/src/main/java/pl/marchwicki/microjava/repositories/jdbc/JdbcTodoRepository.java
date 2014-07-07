@@ -25,7 +25,7 @@ public class JdbcTodoRepository implements TodoDAO {
     }
 
     @Override
-    public void update(long id, Todo todo) {
+    public void update(final long id, final Todo todo) {
         Map<String, Object> params = new HashMap<String, Object>() {{
             put("id", id);
             put("title", todo.getTitle());
