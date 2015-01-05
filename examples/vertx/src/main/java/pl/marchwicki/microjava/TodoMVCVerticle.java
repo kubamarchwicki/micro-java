@@ -3,8 +3,10 @@ package pl.marchwicki.microjava;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.eventbus.ReplyException;
+import org.vertx.java.core.http.HttpServerResponse;
 import org.vertx.java.core.http.RouteMatcher;
 import org.vertx.java.core.json.JsonArray;
+import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Verticle;
 
 public class TodoMVCVerticle extends Verticle {
@@ -25,15 +27,56 @@ public class TodoMVCVerticle extends Verticle {
         });
 
         matcher.post("/todos", (httpServerRequest) -> {
-            httpServerRequest.response().end("POST Hello world!");
+            httpServerRequest.bodyHandler((buffer) -> {
+                String body = buffer.toString();
+
+                vertx.eventBus().sendWithTimeout(StoreRepositoryVerticle.SAVE, new JsonObject(body), 1000, (AsyncResult<Message<JsonObject>> event) -> {
+                    HttpServerResponse response = httpServerRequest.response();
+                    if (event.failed()) {
+                        ReplyException rx = (ReplyException) event.cause();
+                        response.setStatusCode(500)
+                                .setStatusMessage(rx.getMessage()).end();
+                    } else {
+                        response.setStatusCode(201).end(event.result().body().encodePrettily());
+                    }
+                });
+
+            });
         });
 
         matcher.put("/todos/:id", (httpServerRequest) -> {
-            httpServerRequest.response().end("PUT Hello world!");
+            httpServerRequest.bodyHandler((buffer) -> {
+                String body = buffer.toString();
+
+                vertx.eventBus().sendWithTimeout(StoreRepositoryVerticle.UPDATE, new JsonObject(body), 1000, (AsyncResult<Message<JsonObject>> event) -> {
+                    HttpServerResponse response = httpServerRequest.response();
+                    if (event.failed()) {
+                        ReplyException rx = (ReplyException) event.cause();
+                        response.setStatusCode(500)
+                                .setStatusMessage(rx.getMessage()).end();
+                    } else {
+                        response.setStatusCode(204).end();
+                    }
+                });
+
+            });
+
         });
 
         matcher.delete("/todos/:id", (httpServerRequest) -> {
-            httpServerRequest.response().end("DELETE Hello world!");
+            String todoId = httpServerRequest.params().get("id");
+            vertx.eventBus().sendWithTimeout(StoreRepositoryVerticle.DELETE, todoId, 1000, (event) -> {
+
+                HttpServerResponse response = httpServerRequest.response();
+                if (event.failed()) {
+                    ReplyException rx = (ReplyException) event.cause();
+                    response.setStatusCode(500)
+                            .setStatusMessage(rx.getMessage());
+                } else {
+                    response.setStatusCode(204);
+                }
+                response.end();
+            });
         });
 
         matcher.getWithRegEx(".*", (req) -> {

@@ -11,6 +11,9 @@ import java.util.Iterator;
 public class StoreRepositoryVerticle extends Verticle {
     final static String DB_HANDLER_NAME = "persistor";
     final static String GET_ALL = "store.getAll";
+    final static String SAVE = "store.save";
+    final static String UPDATE = "store.update";
+    final static String DELETE = "store.delete";
 
     public void start() {
 
@@ -51,6 +54,66 @@ public class StoreRepositoryVerticle extends Verticle {
 
                 container.logger().info(result);
                 event.reply(result);
+            });
+        });
+
+        vertx.eventBus().registerHandler(SAVE, (Message<JsonObject> msg) -> {
+            final JsonObject todo = msg.body();
+
+            vertx.eventBus().send(StoreRepositoryVerticle.DB_HANDLER_NAME, new JsonObject()
+                    .putString("action", "insert")
+                    .putString("stmt", "INSERT INTO todos (todo_title, todo_completed, todo_order) values (?, ?, ?)")
+                    .putArray("values", new JsonArray()
+                                    .addString(todo.getString("title"))
+                                    .addBoolean(todo.getBoolean("completed"))
+                                    .addNumber(todo.getNumber("order"))), (Message<JsonObject> dbevent) -> {
+
+                container.logger().info(dbevent.body());
+                if (!dbevent.body().getString("status").equals("ok")) {
+                    msg.fail(-1, "Failed to insert element: " + dbevent.body().getString("message"));
+                } else {
+                    JsonObject idObject = dbevent.body().getArray("result").get(0);
+                    msg.reply(todo.putNumber("id", idObject.getNumber("GENERATED_KEY")));
+                }
+            });
+
+        });
+
+        vertx.eventBus().registerHandler(UPDATE, (Message<JsonObject> msg) -> {
+            final JsonObject todo = msg.body();
+
+            vertx.eventBus().send(StoreRepositoryVerticle.DB_HANDLER_NAME, new JsonObject()
+                    .putString("action", "update")
+                    .putString("stmt", "UPDATE todos SET todo_title = ?, todo_completed = ?, todo_order = ? WHERE todo_id = ?")
+                    .putArray("values", new JsonArray()
+                            .addString(todo.getString("title"))
+                            .addBoolean(todo.getBoolean("completed"))
+                            .addNumber(todo.getNumber("order"))
+                            .addNumber(todo.getNumber("id"))), (Message<JsonObject> dbevent) -> {
+
+                container.logger().info(dbevent.body());
+                if (!dbevent.body().getString("status").equals("ok")) {
+                    msg.fail(-1, "Failed to insert element: " + dbevent.body().getString("message"));
+                } else {
+                    msg.reply();
+                }
+            });
+
+        });
+
+        vertx.eventBus().registerHandler(DELETE, (Message<String> msg) -> {
+            String todoId = msg.body();
+
+            vertx.eventBus().send(StoreRepositoryVerticle.DB_HANDLER_NAME, new JsonObject()
+                    .putString("action", "update")
+                    .putString("stmt", "DELETE FROM todos where todo_id = ?")
+                    .putArray("values", new JsonArray().addNumber(new Long(todoId))), (Message<JsonObject> dbevent) -> {
+
+                if (!dbevent.body().getString("status").equals("ok")) {
+                    msg.fail(-1, "Failed to delete element: " + dbevent.body().getString("message"));
+                } else {
+                    msg.reply();
+                }
             });
         });
 
