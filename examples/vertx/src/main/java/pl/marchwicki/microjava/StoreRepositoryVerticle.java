@@ -24,41 +24,34 @@ public class StoreRepositoryVerticle extends Verticle {
         vertx.eventBus().registerHandler(DB_HANDLER_NAME + ".ready", new Handler<Message<JsonObject>>() {
             @Override
             public void handle(Message<JsonObject> event) {
-                container.logger().info("Deployed JDBC module (name="+ DB_HANDLER_NAME +")? " + event.body().getString("status"));
+                container.logger().info("Deployed JDBC module (name=" + DB_HANDLER_NAME + ")? " + event.body().getString("status"));
                 vertx.eventBus().unregisterHandler("persistor.ready", this);
             }
         });
         container.deployModule("com.bloidonia~mod-jdbc-persistor~2.1.3", persistorCfg);
 
-        vertx.eventBus().registerHandler(GET_ALL, new Handler<Message>() {
-            @Override
-            public void handle(final Message event) {
+        vertx.eventBus().registerHandler(GET_ALL, (event) -> {
 
-                vertx.eventBus().send(StoreRepositoryVerticle.DB_HANDLER_NAME, new JsonObject()
-                        .putString("action", "select")
-                        .putString("stmt", "SELECT * FROM todos"), new Handler<Message<JsonObject>>() {
-                    @Override
-                    public void handle(Message<JsonObject> dbevent) {
-                        JsonArray result = new JsonArray();
+            vertx.eventBus().send(StoreRepositoryVerticle.DB_HANDLER_NAME, new JsonObject()
+                    .putString("action", "select")
+                    .putString("stmt", "SELECT * FROM todos"), (Message<JsonObject> dbevent) -> {
+                JsonArray result = new JsonArray();
 
-                        container.logger().info(dbevent.body().getArray("result"));
+                container.logger().info(dbevent.body().getArray("result"));
 
-                        Iterator<Object> i = dbevent.body().getArray("result").iterator();
-                        while(i.hasNext()) {
-                            JsonObject obj = (JsonObject) i.next();
-                            result.addObject(new JsonObject()
-                                .putNumber("id", obj.getNumber("todo_id"))
-                                .putString("title", obj.getString("todo_title"))
-                                .putBoolean("completed", obj.getBoolean("todo_completed"))
-                                .putNumber("order", obj.getNumber("todo_order")));
-                        }
+                Iterator<Object> i = dbevent.body().getArray("result").iterator();
+                while (i.hasNext()) {
+                    JsonObject obj = (JsonObject) i.next();
+                    result.addObject(new JsonObject()
+                            .putNumber("id", obj.getNumber("todo_id"))
+                            .putString("title", obj.getString("todo_title"))
+                            .putBoolean("completed", obj.getBoolean("todo_completed"))
+                            .putNumber("order", obj.getNumber("todo_order")));
+                }
 
-                        container.logger().info(result);
-                        event.reply(result);
-                    }
-                });
-
-            }
+                container.logger().info(result);
+                event.reply(result);
+            });
         });
 
     }

@@ -1,6 +1,5 @@
 package pl.marchwicki.microjava;
 
-import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.platform.Verticle;
 
@@ -13,9 +12,7 @@ public class StaticFilesVerticle extends Verticle {
 
     public void start() {
 
-        vertx.eventBus().registerHandler(HANDLER_NAME, new Handler<Message<String>>() {
-            @Override
-            public void handle(Message<String> event) {
+        vertx.eventBus().registerHandler(HANDLER_NAME, (Message<String> event) -> {
                 String path = event.body();
 
                 InputStream stream = TodoMVCVerticle.class.getResourceAsStream("/META-INF/resources" + path);
@@ -27,8 +24,6 @@ public class StaticFilesVerticle extends Verticle {
                 } else {
                     event.fail(-1, "File not found");
                 }
-
-            }
         });
 
     }
