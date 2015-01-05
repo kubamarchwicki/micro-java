@@ -6,19 +6,29 @@ import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.eventbus.ReplyException;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.RouteMatcher;
+import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.platform.Verticle;
 
 public class TodoMVCVerticle extends Verticle {
 
     public void start() {
 
+        container.deployVerticle(StoreRepositoryVerticle.class.getName());
         container.deployWorkerVerticle(StaticFilesVerticle.class.getName());
 
         RouteMatcher matcher = new RouteMatcher();
         matcher.get("/todos", new Handler<HttpServerRequest>() {
             @Override
-            public void handle(HttpServerRequest httpServerRequest) {
-                httpServerRequest.response().end("GET Hello world!");
+            public void handle(final HttpServerRequest httpServerRequest) {
+                vertx.eventBus().send(StoreRepositoryVerticle.GET_ALL, "", new Handler<Message<JsonArray>>() {
+                    @Override
+                    public void handle(Message<JsonArray> event) {
+                        httpServerRequest.response()
+                                .putHeader("Content-Type", "application/json")
+                                .setStatusCode(200)
+                                .end(event.body().encodePrettily());
+                    }
+                });
             }
         });
 
