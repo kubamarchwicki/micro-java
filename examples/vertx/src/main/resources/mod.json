@@ -1,0 +1,4 @@
+{
+  "main":"pl.marchwicki.microjava.TodoMVCVerticle",
+  "auto-redeploy": true
+}
